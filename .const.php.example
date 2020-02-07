@@ -1,0 +1,13 @@
+<?php
+/**
+ *  Projet: ICT-151-Sandbox
+ *  Filename: Identifiants de login
+ *  Author: Samuel Roland
+ *  Creation date: 07.02.2020
+ */
+//TODO: renommer en .const.php et remplir les valeurs pour la database
+$user = "";
+$pass = "";
+$dbhost = "";
+$dbname = "";
+?>
