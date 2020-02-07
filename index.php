@@ -12,7 +12,7 @@ function getAllItems()  //prendre tous les éléments
     require '.const.php';  //récuperer les identifiants
     try {   //essayer
         $dbh = new PDO('mysql:host=' . $dbhost . ';dbname=' . $dbname, $user, $pass);   //créer un objet PDO
-$query = "SELECT filmmakersnumber, lastname, firstname FROM filmmakers";//Ecrire la requête.
+        $query = "SELECT filmmakersnumber, lastname, firstname FROM filmmakers";//Ecrire la requête.
         $statment = $dbh->prepare($query);  //préparer la requête
         $statment->execute();   //éxecuter la requête
         $queryResult = $statment->fetchAll();   //aller chercher le résultat
@@ -24,12 +24,45 @@ $query = "SELECT filmmakersnumber, lastname, firstname FROM filmmakers";//Ecrire
     }
 }
 
+function makerOf($filmname)
+{    //trouver le réalisateur d'un film:
+    require '.const.php';
+    try {
+        $dbh = new PDO('mysql:host=' . $dbhost . ';dbname=' . $dbname, $user, $pass);   //créer un objet PDO
+        $query = "SELECT firstname, lastname FROM films
+LEFT JOIN make ON films.id = make.film_id
+LEFT JOIN filmmakers ON make.filmmaker_id = filmmakers.id
+WHERE films.name = \"Ant-Man\";";
+        $statment = $dbh->prepare($query);
+        $statment->execute();
+        $queryResult = $statment->fetchAll();
+        $dbh = null;
+        return $queryResult;
+    } catch (PDOException $e) {
+        echo "Error!: " . $e->getMessage() . "<br/>";
+        return null;
+    }
 
-//Test unitaire de la fonction getAllItems:
+}
+
+echo "<br/>";
+echo "Test unitaire de la fonction getAllItems:";
 $items = getAllItems();
 if (count($items) == 4) {
     echo "getAllItems() retourne 4 éléments OK !!";
 } else {
     echo "getAllItems() retourne null BUG ...";
 }
+echo "<br/>";
+
+echo "Test unitaire de la fonction getAllItems:";
+$filmname = "Ant-Man";
+$filmmakers = makerOf($filmname);
+if ($filmmakers[0]['firstname'] == "Jean-Philippe" && $filmmakers[2]['firstname'] == "Jean-Michel") {
+    echo "makerOf() retourne Jean-Philippe et Jean-Michel donc OK !!";
+} else {
+    echo "makerOf() retourne null donc BUG ...";
+}
+
+
 ?>
