@@ -11,28 +11,33 @@ require '.const.php';  //récuperer les identifiants
 $cmd = "mysql -u $user -p$pass < Restore-MCU-PO-Final.sql";   //command system pour
 exec($cmd);
 
-function getAllItems()  //prendre tous les éléments
+function getPDO()   //create the PDO object 
 {
     require '.const.php';  //récuperer les identifiants
+    return new PDO('mysql:host=' . $dbhost . ';dbname=' . $dbname, $user, $pass);   //créer un objet PDO
+}
+
+
+function getAllItems()  //prendre tous les éléments
+{
     try {   //essayer
-        $dbh = new PDO('mysql:host=' . $dbhost . ';dbname=' . $dbname, $user, $pass);   //créer un objet PDO
-        $query = "SELECT filmmakersnumber, lastname, firstname FROM filmmakers";//Ecrire la requête.
+        $dbh = getPDO();
+        $query = "SELECT filmmakersnumber, lastname, firstname FROM filmmakers";    //Ecrire la requête.
         $statment = $dbh->prepare($query);  //préparer la requête
         $statment->execute();   //éxecuter la requête
         $queryResult = $statment->fetchAll();   //aller chercher le résultat
         $dbh = null;    //remettre à zéro
         return $queryResult;    //retourner le résultat
     } catch (PDOException $e) { //en cas d'erreur dans le try
-        echo "Error!: " . $e->getMessage() . "<br/>";
+        echo "Error!: " . $e->getMessage() . "\n";
         return null;
     }
 }
 
 function getFilmMakerByName($lastname)
 {
-    require '.const.php';  //récuperer les identifiants
-    try {   //essayer
-        $dbh = new PDO('mysql:host=' . $dbhost . ';dbname=' . $dbname, $user, $pass);   //créer un objet PDO
+    try {
+        $dbh = getPDO();   //créer un objet PDO
         $query = "SELECT * FROM filmmakers WHERE lastname = '" . $lastname . "';";//Ecrire la requête.
         $statment = $dbh->prepare($query);  //préparer la requête
         $statment->execute();   //éxecuter la requête
@@ -40,16 +45,31 @@ function getFilmMakerByName($lastname)
         $dbh = null;    //remettre à zéro
         return $queryResult;    //retourner le résultat
     } catch (PDOException $e) { //en cas d'erreur dans le try
-        echo "Error!: " . $e->getMessage() . "<br/>";
+        echo "Error!: " . $e->getMessage() . "\n";
         return null;
     }
 }
 
-function makerOf($filmname)
-{    //trouver le réalisateur d'un film:
-    require '.const.php';
+function getFilmMaker($id)
+{
     try {
-        $dbh = new PDO('mysql:host=' . $dbhost . ';dbname=' . $dbname, $user, $pass);   //créer un objet PDO
+        $dbh = getPDO();   //créer un objet PDO
+        $query = "SELECT * FROM filmmakers WHERE id = " . $id . ";";;//Ecrire la requête.
+        $statment = $dbh->prepare($query);  //préparer la requête
+        $statment->execute();   //éxecuter la requête
+        $queryResult = $statment->fetch(PDO::FETCH_ASSOC);   //aller chercher le résultat
+        $dbh = null;    //remettre à zéro
+        return $queryResult;    //retourner le résultat
+    } catch (PDOException $e) { //en cas d'erreur dans le try
+        echo "Error!: " . $e->getMessage() . "\n";
+        return null;
+    }
+}
+
+function makerOf($filmname)  //trouver le réalisateur d'un film:
+{
+    try {
+        $dbh = getPDO();
         $query = "SELECT firstname, lastname FROM films
 LEFT JOIN make ON films.id = make.film_id
 LEFT JOIN filmmakers ON make.filmmaker_id = filmmakers.id
@@ -60,13 +80,18 @@ WHERE films.name = \"Ant-Man\";";
         $dbh = null;
         return $queryResult;
     } catch (PDOException $e) {
-        echo "Error!: " . $e->getMessage() . "<br/>";
+        echo "Error!: " . $e->getMessage() . "\n";
         return null;
     }
 
 }
 
-echo "<br/>";
+function updateFilmMaker($filmMaker)
+{
+
+}
+
+echo "\n";
 echo "Test unitaire de la fonction getAllItems:";
 $items = getAllItems();
 if (count($items) == 4) {
@@ -75,7 +100,7 @@ if (count($items) == 4) {
     echo "getAllItems() retourne null BUG ...";
 }
 
-echo "<br/>";
+echo "\n";
 $filmname = "Ant-Man";
 $filmmakers = makerOf($filmname);
 echo "Test unitaire de la fonction getAllItems: Quel sont les réalisateurs de $filmname ??  \n";
@@ -86,12 +111,13 @@ if ($filmmakers[0]['firstname'] == "Jean-Philippe" && $filmmakers[2]['firstname'
     echo "makerOf() retourne null donc BUG ...";
 }
 echo "\n";
-//Test écrit par M. Carrel (exercie de TDD.)
+
+//Test écrit par M. Carrel (exercie de TDD)
 echo "Test unitaire de la fonction getFilmMakerName : ";
 $item = getFilmMakerByName('Chamblon');
 print_r($item);
 if ($item['id'] == 3) {
-    echo 'OK !!!';
+    echo 'OK !!! pour \'Chamblon\'';
 } else {
     echo '### BUG ###';
 }
