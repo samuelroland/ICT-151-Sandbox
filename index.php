@@ -86,7 +86,7 @@ WHERE films.name = \"Ant-Man\";";
 
 }
 
-function getAllFieldTable($tablename)
+function getAllFieldFromTable($tablename)   //récuperer la liste de tous les champs d'une table
 {
     try {
         $dbh = getPDO();
@@ -106,22 +106,18 @@ function getAllFieldTable($tablename)
 
 function updateFilmMaker($filmMaker)
 {
-    $listFields = getAllFieldTable("filmmakers");
-    array_keys($listFields);
-    $listToSet = "";    //liste d'éléments à set formatées
+    $listFields = array_keys($filmMaker);   //les valeurs à modifier sont celles du tableaux. prendre les clés en un tableau
+    $listToSet = "";    //liste d'éléments formatées à set pour l'update
     foreach ($listFields as $oneField) {
-        if ($oneField != "id") {
-            $listToSet .= $oneField[0] . "=:" . $oneField[0] . ", ";
+        if ($oneField != "id") {    //on exclut le champ id. interdit de changer.
+            $listToSet .= $oneField . "=:" . $oneField . ", ";
         }
     }
-    $listToSet = substr($listToSet, 0, strlen($listToSet) - 2); //enlever la virgule de fin
+    $listToSet = substr($listToSet, 0, strlen($listToSet) - 2); //enlever la string ", " de fin
 
     try {
         $dbh = getPDO();   //créer un objet PDO
-        $query = "UPDATE filmmakers 
- SET $listToSet
-WHERE id =:id;";//Ecrire la requête.
-
+        $query = "UPDATE filmmakers SET $listToSet WHERE id =:id;";//Ecrire la requête.
 
         $statment = $dbh->prepare($query);  //préparer la requête
         $statment->execute($filmMaker);   //éxecuter la requête
