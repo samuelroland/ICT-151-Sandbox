@@ -1,9 +1,15 @@
-Mémento en PHP et BDD en ICT-151:
-PDO c'est un outil pour travailler avec les bases de données. (comme une pelle c'est un outil pour creuser, il y a plusieurs outils)
+# Mémento en PHP et BDD en ICT-151:
+## Intégrer des BDD dans des applis WEB
+
+### Introduction:
+Dans ce cours, on travaille avec PDO (PHP Data Object s?). C'est un outil pour travailler avec les bases de données. (comme pour la pelle qui est un outil pour creuser, il y a plusieurs outils mais nous n'utiliserons ici que PDO).
+
+Pour ce mémento, on utilise une base de donnée appelée `mcu` qui contient des données sur des films marvel.
 
 
-Exemple:
+Exemple de première utilisation (code repris de php.net et valeurs adaptées):
 
+//Identifiants pour la DBB
 $user = "ICT-151";
 $pass = "Pa\$\$w0rd";
 
@@ -19,8 +25,8 @@ try {
 }
 
 Avec CMDER:
-C:\Users\samuel.roland\Documents\Github\ICT-151-Sandbox (master -> origin)
-λ php -f index.php
+C:\Users\samuel.roland\Documents\Github\ICT-151-Sandbox (master -> origin)  //on vient sur DOCUMENTROOT du serveur.
+λ php -f index.php  //fichier php à executer
 Array
 (
     [id] => 1
@@ -52,7 +58,11 @@ Array
     [5] => UK
 )
 
-Mais petit problème d'avoir les identifiants en clair et de les publier sur Github. donc on va faire un autre fichier '.const.php' qui contient les constantes pour la connexion.
+Résultat: Il execute le fichier php et affiche donc les deux enregistrements trouvés dans la BDD.
+
+Mais c'est un problème d'avoir les identifiants en clair dans le code et de les publier sur Github.
+C'est pour cette raison qu'on va faire un fichier séparé `.const.php` qui contient uniquement les constantes des informations pour la connexion à la BDD. Le fichier commence par un `.`. C'est une convention pour les fichiers cachés.
+
 
 <?php
 /**
@@ -69,7 +79,9 @@ $dbname = "mcu";
 ?>
 
 
-Puis on ignore le fichier pour ne pas l'envoyer sur Git.
+Ensuite:
+- on ignore le fichier en l'ajoutant au `.gitignore` pour ne pas l'envoyer sur Git.
+- on le récupère par un `require .const.php;` en haut de la fonction. Attention à ne pas utiliser `require_once` puisque plusieurs fonctions vont en avoir besoin.
 
 sauf que les développeurs qui travaillent avec nous ne savent pas qu'on a fait ca. Donc on fait une copie en .example qu'ils pourront renommer et remplir.
 
