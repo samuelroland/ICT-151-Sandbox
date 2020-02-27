@@ -11,7 +11,7 @@ DROP DATABASE IF EXISTS mcu;
 -- Création de la structure:
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 CREATE SCHEMA IF NOT EXISTS `MCU` DEFAULT CHARACTER SET utf8 ;
 
@@ -24,9 +24,9 @@ CREATE TABLE IF NOT EXISTS `MCU`.`films` (
   `totalrevenue` FLOAT(11) NULL DEFAULT NULL,
   `productionsocietie_id` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `name_UNIQUE` (`name` ASC, `releasedate` ASC),
-  UNIQUE INDEX `filmcode_UNIQUE` (`filmcode` ASC),
-  INDEX `fk_films_productionsocieties1_idx` (`productionsocietie_id` ASC),
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC, `releasedate` ASC) VISIBLE,
+  UNIQUE INDEX `filmcode_UNIQUE` (`filmcode` ASC) VISIBLE,
+  INDEX `fk_films_productionsocieties1_idx` (`productionsocietie_id` ASC) VISIBLE,
   CONSTRAINT `fk_films_productionsocieties1`
     FOREIGN KEY (`productionsocietie_id`)
     REFERENCES `MCU`.`productionsocieties` (`id`)
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `MCU`.`productionsocieties` (
   `creation` DATE NOT NULL,
   `headoffice` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `name_UNIQUE` (`name` ASC))
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `MCU`.`actors` (
   `birthdate` DATE NOT NULL,
   `nationality` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `actornumber_UNIQUE` (`actornumber` ASC))
+  UNIQUE INDEX `actornumber_UNIQUE` (`actornumber` ASC) VISIBLE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -64,15 +64,15 @@ CREATE TABLE IF NOT EXISTS `MCU`.`heroes` (
   `alias` VARCHAR(45) NOT NULL,
   `actor_id` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `fk_heroes_actors1_idx` (`actor_id` ASC),
-  UNIQUE INDEX `name_UNIQUE` (`name` ASC),
+  INDEX `fk_heroes_actors1_idx` (`actor_id` ASC) VISIBLE,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE,
   CONSTRAINT `fk_heroes_actors1`
     FOREIGN KEY (`actor_id`)
     REFERENCES `MCU`.`actors` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-DEFAULT CHARACTER SET = UTF8;
+DEFAULT CHARACTER SET = utf8;
 
 CREATE TABLE IF NOT EXISTS `MCU`.`filmmakers` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `MCU`.`filmmakers` (
   `birthname` DATE NOT NULL,
   `nationality` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `filmmakersnumber_UNIQUE` (`filmmakersnumber` ASC))
+  UNIQUE INDEX `filmmakersnumber_UNIQUE` (`filmmakersnumber` ASC) VISIBLE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -91,8 +91,8 @@ CREATE TABLE IF NOT EXISTS `MCU`.`make` (
   `film_id` INT(11) NULL DEFAULT NULL,
   `filmmaker_id` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `fk_films_has_filmmakers_filmmakers1_idx` (`filmmaker_id` ASC),
-  INDEX `fk_films_has_filmmakers_films_idx` (`film_id` ASC),
+  INDEX `fk_films_has_filmmakers_filmmakers1_idx` (`filmmaker_id` ASC) VISIBLE,
+  INDEX `fk_films_has_filmmakers_films_idx` (`film_id` ASC) VISIBLE,
   CONSTRAINT `fk_films_has_filmmakers_films`
     FOREIGN KEY (`film_id`)
     REFERENCES `MCU`.`films` (`id`)
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `MCU`.`make` (
   CONSTRAINT `fk_films_has_filmmakers_filmmakers1`
     FOREIGN KEY (`filmmaker_id`)
     REFERENCES `MCU`.`filmmakers` (`id`)
-    ON DELETE NO ACTION
+    ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -112,8 +112,8 @@ CREATE TABLE IF NOT EXISTS `MCU`.`play` (
   `film_id` INT(11) NOT NULL,
   `since` DATE NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `fk_heroes_has_films_films1_idx` (`film_id` ASC),
-  INDEX `fk_heroes_has_films_heroes1_idx` (`heroe_id` ASC),
+  INDEX `fk_heroes_has_films_films1_idx` (`film_id` ASC) VISIBLE,
+  INDEX `fk_heroes_has_films_heroes1_idx` (`heroe_id` ASC) VISIBLE,
   CONSTRAINT `fk_heroes_has_films_heroes1`
     FOREIGN KEY (`heroe_id`)
     REFERENCES `MCU`.`heroes` (`id`)
