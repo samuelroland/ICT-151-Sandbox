@@ -49,6 +49,23 @@ function createListFieldsForQuery($tablename)
     return $listToSet;
 }
 
+function countFilmMakers()
+{
+    try {
+        $dbh = getPDO();   //créer un objet PDO
+        $query = "SELECT count(*) as nb FROM filmmakers";;//Ecrire la requête.
+        $statment = $dbh->prepare($query);  //préparer la requête
+        $statment->execute();   //éxecuter la requête
+        $queryResult = $statment->fetch(PDO::FETCH_ASSOC);   //aller chercher le résultat
+        $dbh = null;    //remettre à zéro
+        extract($queryResult);  //$nb
+        return $nb;    //retourner le résultat
+    } catch (PDOException $e) { //en cas d'erreur dans le try
+        echo "Error!: " . $e->getMessage() . "\n";
+        return null;
+    }
+}
+
 function getFilmMaker($id)
 {
     try {
@@ -104,32 +121,24 @@ function createFilmMaker($filmMaker)
 
     //Préparation de la liste des données
     $listDataToCreate = "':";   //au départ
-    $listDataToCreate .= implode("', ':", $filmMaker);  //liste des données en paramètre.
+    $listDataToCreate = "':";   //au départ
+    $listDataToCreate .= implode("', ':", array_keys($filmMaker));  //liste des données en paramètre.
     $listDataToCreate .= "'";
 
-    var_dump($listDataToCreate);
     //Préparation de la liste de champs qui vont être insérés.
     $listFieldToCreate = implode(", ", array_keys($filmMaker));  //liste des données des champs à insérer, séparés par des ", "
-    var_dump($listFieldToCreate);
-    $data = [$filmMaker, array_keys($filmMaker)];
-    $data = array_merge($filmMaker, array_keys($filmMaker));
-    for ($i = 0; $i < count($data) / 2; $i++) {
-        $data["-" . $data[$i]] = $data[$i];
-        unset($data[$i]);
-    }
 
-    print_r($data);
     try {
         $dbh = getPDO();   //créer un objet PDO
         $query = "INSERT INTO filmmakers ($listFieldToCreate) VALUES ($listDataToCreate) ";//Ecrire la requête.
         $statment = $dbh->prepare($query);  //préparer la requête
         $statment->execute($filmMaker);   //éxecuter la requête
-        $queryResult = $statment->fetch(PDO::FETCH_ASSOC);   //aller chercher le résultat
+        $filmMaker['id'] = $dbh->lastInsertId();    //enregistrer l'id générée par la base de données.
         $dbh = null;    //remettre à zéro
-        return $queryResult;    //retourner le résultat
+        return $filmMaker;
     } catch (PDOException $e) { //en cas d'erreur dans le try
         echo "Error!: " . $e->getMessage() . "\n";
-        return null;
+        return false;
     }
 }
 
