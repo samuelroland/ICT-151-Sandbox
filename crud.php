@@ -38,11 +38,11 @@ function getAllFieldFromTable($tablename)   //récuperer la liste de tous les ch
 //Créer la liste formatée pour la requête sql. ex: "firstname=:firstname, lastname=:lastname, ..." selon les champs d'un tableau associatif
 function createListFieldsForQuery($tablename)
 {
-    $listFields = array_keys(getAllFieldFromTable($tablename));   //les valeurs à modifier sont celles du tableaux. prendre les clés en un tableau
+    $listFields = getAllFieldFromTable($tablename);   //les valeurs à modifier sont celles du tableaux. prendre les clés en un tableau
     $listToSet = "";    //liste d'éléments formatées à set pour l'update
     foreach ($listFields as $oneField) {
         if ($oneField != "id") {    //on exclut le champ id. interdit de changer.
-            $listToSet .= $oneField . "=:" . $oneField . ", ";
+            $listToSet .= $oneField[0] . "=:" . $oneField[0] . ", ";
         }
     }
     $listToSet = substr($listToSet, 0, strlen($listToSet) - 2); //enlever la string ", " de fin
@@ -120,17 +120,17 @@ function createFilmMaker($filmMaker)
     unset($filmMaker['id']);    //enlever id pour ne pas la update.
 
     //Préparation de la liste des données
-    $listDataToCreate = "':";   //au départ
-    $listDataToCreate = "':";   //au départ
-    $listDataToCreate .= implode("', ':", array_keys($filmMaker));  //liste des données en paramètre.
-    $listDataToCreate .= "'";
+    $listDataToCreate = ":";   //au départ
+    $listDataToCreate = ":";   //au départ
+    $listDataToCreate .= implode(", :", array_keys($filmMaker));  //liste des données en paramètre.
+    $listDataToCreate .= "";
 
     //Préparation de la liste de champs qui vont être insérés.
     $listFieldToCreate = implode(", ", array_keys($filmMaker));  //liste des données des champs à insérer, séparés par des ", "
 
     try {
         $dbh = getPDO();   //créer un objet PDO
-        $query = "INSERT INTO filmmakers ($listFieldToCreate) VALUES ($listDataToCreate) ";//Ecrire la requête.
+        $query = "INSERT INTO filmmakers ($listFieldToCreate) VALUES ($listDataToCreate);";//Ecrire la requête.
         $statment = $dbh->prepare($query);  //préparer la requête
         $statment->execute($filmMaker);   //éxecuter la requête
         $filmMaker['id'] = $dbh->lastInsertId();    //enregistrer l'id générée par la base de données.
@@ -144,19 +144,16 @@ function createFilmMaker($filmMaker)
 
 function updateFilmMaker($filmMaker)
 {
-    $data = [$filmMaker, array_keys($filmMaker)];
     $listToSet = createListFieldsForQuery("filmmakers");
     try {
         $dbh = getPDO();   //créer un objet PDO
         $query = "UPDATE filmmakers SET $listToSet WHERE id =:id;";//Ecrire la requête.
         $statment = $dbh->prepare($query);  //préparer la requête
-        $statment->execute($data);   //éxecuter la requête
-        $queryResult = $statment->fetch(PDO::FETCH_ASSOC);   //aller chercher le résultat
-        $dbh = null;    //remettre à zéro
-        return $queryResult;    //retourner le résultat
+        $statment->execute($filmMaker);   //éxecuter la requête
+        return true;    //retourner le résultat
     } catch (PDOException $e) { //en cas d'erreur dans le try
         echo "Error!: " . $e->getMessage() . "\n";
-        return null;
+        return false;
     }
 }
 
@@ -165,15 +162,14 @@ function deleteFilmMaker($id)
 {
     try {
         $dbh = getPDO();   //créer un objet PDO
-        $query = "DELETE FROM filmmakers WHERE id=$id;";//Ecrire la requête.
+        $query = "DELETE FROM filmmakers WHERE id=:id;";//Ecrire la requête.
         $statment = $dbh->prepare($query);  //préparer la requête
-        $statment->execute();   //éxecuter la requête
-        $queryResult = $statment->fetch(PDO::FETCH_ASSOC);   //aller chercher le résultat
+        $statment->execute(["id" => $id]);   //éxecuter la requête
         $dbh = null;    //remettre à zéro
-        return $queryResult;    //retourner le résultat
+        return true;    //retourner le résultat
     } catch (PDOException $e) { //en cas d'erreur dans le try
         echo "Error!: " . $e->getMessage() . "\n";
-        return null;
+        return false;
     }
 }
 

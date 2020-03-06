@@ -48,31 +48,72 @@ $newfilmmaker = createFilmMaker($filmMakerTest);
 
 if (createFilmMaker($filmMakerTest) != null) {
     if (countFilmMakers() == $nfm + 1) {     //il y a un enregistrement de plus dans la table.
-        $item = getFilmMaker($newfilmmaker['id']);
-        //if () WIP
+        $readback = getFilmMaker($newfilmmaker['id']);
+        if ($readback != null) {
+            if ($readback['id'] == $newfilmmaker['id']) {
+                if (empty(array_diff($newfilmmaker, $readback))) {   //compare les deux tableaux pour savoir si il n'y a pas de différence.
+                    echo "OK !!!";
+                } else {
+                    echo "BUG, error in the data inserted";
+                }
+            } else {
+                echo "BUG, error in the data inserted";
+            }
+        } else {
+            echo "BUG, record with id {$newfilmmaker['id']} not found ...";
+        }
     } else {
         echo "BUG count records unchanged...";
     }
-
 } else {
     echo "BUG function crash";
 }
 
-$readback = getFilmMakerByName("Rabin");
-//Check:
-var_dump($readback);
-if ($readback['filmmakersnumber'] == $randNumber) {
+if ($readback) {
     echo "OK !!!";
 } else {
     echo "BUG ...";
 }
-echo "filmmakersnumber = $randNumber";
-
 
 echo "\nTest Update() ";
+$filmmakertoupdate = getFilmMaker(4);
 
+//Changer de certaines valeurs
+$filmmakertoupdate['lastname'] = "Pico";
+$filmmakertoupdate['firstname'] = "Richard";
+
+//mise à jour
+if (updateFilmMaker($filmmakertoupdate)) {   //si réussit la requête
+    $readback = getFilmMakerByName("Pico");
+    if (empty(array_diff($readback, $filmmakertoupdate))) { //pas de différences entre le tableau modifié et le tableau au retour de la lecture
+        echo "OK !!!";
+    } else {
+        echo "BUG, not all fields have been updated...";
+    }
+} else {
+    echo "BUG, error in executing the query";
+}
 
 echo "\nTest Delete() ";
 
+$nfm = countFilmMakers();
+deleteFilmMaker($filmMakerTest);
+
+
+if (deleteFilmMaker(4)) {   // si la requete réussi
+    if (countFilmMakers() == $nfm - 1) {     //il y a un enregistrement de moins dans la table.
+        $readback = deleteFilmMaker(4);
+        if ($readback != null) {    //si il ne trouve plus l'enregistrement
+            echo "OK !!!";
+        } else {
+            echo "BUG, record not deleted";
+        }
+
+    } else {
+        echo "BUG count records unchanged...";
+    }
+} else {
+    echo "BUG function crash";
+}
 
 ?>
