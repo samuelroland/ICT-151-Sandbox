@@ -97,18 +97,16 @@ if (updateFilmMaker($filmmakertoupdate)) {   //si réussit la requête
 echo "\nTest Delete() ";
 
 $nfm = countFilmMakers();
-deleteFilmMaker($filmMakerTest);
 
 
 if (deleteFilmMaker(4)) {   // si la requete réussi
     if (countFilmMakers() == $nfm - 1) {     //il y a un enregistrement de moins dans la table.
-        $readback = deleteFilmMaker(4);
-        if ($readback != null) {    //si il ne trouve plus l'enregistrement
+        $readback = getFilmMaker(4);
+        if ($readback == null) {    //si il ne trouve plus l'enregistrement
             echo "OK !!!";
         } else {
             echo "BUG, record not deleted";
         }
-
     } else {
         echo "BUG count records unchanged...";
     }
