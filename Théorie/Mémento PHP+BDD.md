@@ -6,7 +6,14 @@ Dans ce cours, on travaille avec PDO (PHP Data Object s?). C'est un outil pour t
 
 Pour ce mémento, on utilise une base de donnée appelée `mcu` qui contient des données sur des films marvel.
 
+### Rappel: CRUD
+En deux mots, c'est le résumé de ce qu'on peut faire dans beaucoup d'applications en informatiques, puisque ce sont les fonctionnalités de base pour intéragir avec des données.
+- **C**reate: créer
+- **R**ead: lire/afficher
+- **U**pdate: mettre à jour/modifier
+- **D**elete: supprimer
 
+### Notions de bases
 Exemple de première utilisation (code repris de php.net et valeurs adaptées):
 
     //Identifiants pour la DBB
@@ -123,13 +130,23 @@ On crée un objet PDO de cette manière:
 4. Aller chercher tous les résultats:
     
         $queryResult = $statment->fetchAll();
+        
 Ou un seul résultat:
-$queryResult = $statment->fetch();
 
-fetchAll() retourne un tableau d'éléments (étant des tableaux contenants les informations d'un enregistrement).
+    $queryResult = $statment->fetch();
+
+fetchAll() retourne un tableau d'éléments (étant des tableaux associatifs contenants les informations d'un enregistrement). tandis que fetch() retourne un tableau associatif qui ne contient donc qu'un seul enregistrement.
+
+Visuellement ca donne ca:
+
+![Fetch-FetchAll.png](asdf)
+
 
 
 ### Faire des tests unitaires:
+
+Les tests unitaires permettent de tester le bon fonctionnement de chaque fonction séparément (unitaire donc on teste qu'une seule fonction). Dans ce cours, on fait des tests unitaires des fonctions du modèle et on lance les tests depuis un shell donc sans passer par un navigateur.
+
 Une fois qu'on a une fonction (changée le code précédent dans une fonction):
 
     function getAllItems()  //prendre tous les éléments
@@ -160,15 +177,34 @@ on peut faire un test unitaire:
         echo "BUG ...";
     }
     
+### Comment faire des tests unitaires ?
+Voici des explications d'une logique pour des tests basiques et simples pour des fonctions de CRUD, notamment quelques critères de vérification:
 
+Idée de structure d'un test:
+- un titre "Test de la fonction getUsers()"
+- Préparer des données
+- Utiliser la fonction pour créer faire une action de CRUD
+- Tester si le résultat est celui souhaité en vérifiant certains critères
+- Affichage d'une erreur ou que le test a réussi.
+    
+### Php dans un shell ?
+Oui cest possible ! Enfin disons que le résultat généré est affichable en texte.
 
-TDD = Test Driven Developpement
-Principe de développement où on commence par faire les tests puis on fait le code jusqu'à que le test fonctionne.
+1. se placer dans le bon répertoire `cd C:/Users/John/Documents/AppWeb/` c'est à dire à la racine du site généralement.
+1. savoir dans quel sous dossier se trouve le fichier de test qu'on veut lancer.
+1. lancer le fichier avec la commande `php -f <testfile.php>` ou `php -f <unitTests/testfile.php>` si il est placé dans un sous-dossier.
 
-Pour ne pas avoir un tableau indexé et associatif (toutes les données étant donc à double), il faut mettre un paramètre au fetchAll() qui dit le type de tableau qu'il doit retourner:
+Si il y a des chemins de fichiers dans le code (pour rechercher des données d'un fichier .json par ex.), les liens relatifs par rapport à la racine du site pourrait poser problème si on execute depuis le dossier `unitTests` puisque les liens seront relatifs au dossier du shell.
+Pour ne pas devoir changer 2 fois tous les liens relatifs, il est possible et conseillé de lancer les tests depuis le dossier du fichier `index.php` ou du fichier qui est appelé en premier et donc d'où les liens relatifs partent. pour ce faire il suffit de pointer un fichier de test d'un sous-dossier, par exemple `php -f unitTests/testfile.php`
 
-- PDO::FETCH_ASSOC pour avoir un tableau associatif uniquement
-- PDO::FETCH_NUM pour avoir un tableau indexé uniquement (partant de index 0)
+**TDD** = Test Driven Developpement
+
+Principe de développement où on commence par faire les tests puis on fait le code de ce qui est testé (une fonction par exemple) jusqu'à que le test fonctionne. Le développement est donc conduit/guidé par des tests.
+
+Pour ne pas avoir un tableau indexé et associatif en même temps (toutes les données étant donc à double), il faut mettre un paramètre au fetchAll() qui dit le type de tableau qu'il doit retourner:
+
+- `PDO::FETCH_ASSOC` pour avoir un tableau associatif uniquement
+- `PDO::FETCH_NUM` pour avoir un tableau indexé uniquement (partant de index 0)
 
 Changement:
     
