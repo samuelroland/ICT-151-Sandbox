@@ -1,10 +1,10 @@
 # Mémento en PHP et BDD en ICT-151:
-## Intégrer des BDD dans des applis WEB
+## Intégrer des BDD dans des applications WEB
 
 ### Introduction:
 Dans ce cours, on travaille avec PDO (PHP Data Object s?). C'est un outil pour travailler avec les bases de données. (comme pour la pelle qui est un outil pour creuser, il y a plusieurs outils pour travailler avec des bases de données, mais nous n'utiliserons dans ce cours que PDO).
 
-Pour ce mémento, on utilise une base de donnée appelée `mcu` qui contient des données sur des films marvel. On retrouve le script [ici](../Restore-MCU-PO-Final.sql).
+Pour ce mémento, on utilise une base de donnée appelée `mcu` qui contient des données sur des films marvel. On retrouve [le script SQL ici](../Restore-MCU-PO-Final.sql).
 
 ### CRUD
 En résumé, ce sont les 4 fonctionnalités de base dans beaucoup d'applications en informatiques, pour intéragir avec des données.
@@ -197,15 +197,20 @@ on peut faire un test unitaire simple:
     }
 
 ### Comment construire des tests unitaires ?
-Voici des explications d'une proposition de structure et d'une logique pour des tests basiques, pour des fonctions CRUD, notamment quelques critères de vérification:
+Voici des explications d'une proposition de structure et de critères pour des tests basiques, pour des fonctions CRUD:
 
-Idée de structure d'un test:
+#### Idée de structure d'un test:
 - un titre "Test de la fonction getUsers()"
 - Préparer des données
 - Utiliser la fonction pour créer faire une action de CRUD
 - Tester si le résultat est celui souhaité en vérifiant certains critères
 - Affichage d'une erreur ou que le test a réussi.
-    
+
+#### Idées de critères à vérifier
+On préférera faire les tests dans l'ordre suivant: Read, Create, Update, Delete, ce qui permet de lire des données, créer un nouvel élément, le modifier, puis le supprimer. 
+Ainsi à la fin des tests, le contenu de la base de données n'a pas été modifié.
+
+
 ### Du PHP dans un shell ?
 Oui cest possible ! Enfin disons que le résultat généré est affiché en mode console. Donc pas vraiment fait pour une vue. Par contre pour des tests ou la gestion du serveur, c'est pratique.
 
