@@ -2,14 +2,14 @@
 ## Intégrer des BDD dans des applis WEB
 
 ### Introduction:
-Dans ce cours, on travaille avec PDO (PHP Data Object s?). C'est un outil pour travailler avec les bases de données. (comme pour la pelle qui est un outil pour creuser, il y a plusieurs outils mais nous n'utiliserons dans ce cours que PDO).
+Dans ce cours, on travaille avec PDO (PHP Data Object s?). C'est un outil pour travailler avec les bases de données. (comme pour la pelle qui est un outil pour creuser, il y a plusieurs outils pour travailler avec des bases de données, mais nous n'utiliserons dans ce cours que PDO).
 
-Pour ce mémento, on utilise une base de donnée appelée `mcu` qui contient des données sur des films marvel.
+Pour ce mémento, on utilise une base de donnée appelée `mcu` qui contient des données sur des films marvel. On retrouve le script [ici](../Restore-MCU-PO-Final.sql).
 
-### Rappel: CRUD
-En deux mots, c'est le résumé de ce qu'on peut faire dans beaucoup d'applications en informatiques, puisque ce sont les fonctionnalités de base pour intéragir avec des données.
+### CRUD
+En résumé, ce sont les 4 fonctionnalités de base dans beaucoup d'applications en informatiques, pour intéragir avec des données.
 - **C**reate: créer
-- **R**ead: lire/afficher
+- **R**ead: lire
 - **U**pdate: mettre à jour/modifier
 - **D**elete: supprimer
 
@@ -135,17 +135,36 @@ Ou un seul résultat:
 
     $queryResult = $statment->fetch();
 
-fetchAll() retourne un tableau d'éléments (étant des tableaux associatifs contenants les informations d'un enregistrement). tandis que fetch() retourne un tableau associatif qui ne contient donc qu'un seul enregistrement.
+fetchAll() retourne un tableau de tableaux associatifs. tandis que fetch() retourne un tableau associatif qui ne contient donc qu'un seul enregistrement.
+
+
 
 Visuellement ca donne ca:
 
 ![Fetch-FetchAll.png](asdf)
 
+**ATTENTION particularité**.
+Pour ne pas avoir un tableau indexé et associatif (créé par fetch() ou fetchAll()) en même temps (toutes les données étant donc à double), il faut mettre un paramètre aux méthodes qui dit le type de tableau qu'il doit retourner. Ces paramètres sont des constantes internes de PDO. On les atteind de la manière suivante `PDO::NomConstante`
+
+Une petite liste de possibilités très utiles:
+- `PDO::FETCH_ASSOC` pour avoir un tableau associatif uniquement
+- `PDO::FETCH_NUM` pour avoir un tableau indexé uniquement (partant de index 0)
+
+Changement:
+    
+    $queryResult = $statment->fetchAll();
+en
+    
+    $queryResult = $statment->fetchAll(PDO::FETCH_ASSOC);
+
+source: https://www.php.net/manual/en/pdostatement.fetch
 
 
 ### Faire des tests unitaires:
 
-Les tests unitaires permettent de tester le bon fonctionnement de chaque fonction séparément (unitaire donc on teste qu'une seule fonction). Dans ce cours, on fait des tests unitaires des fonctions du modèle et on lance les tests depuis un shell donc sans passer par un navigateur.
+Les tests unitaires permettent de tester le bon fonctionnement de chaque fonction séparément (unitaire donc on teste qu'une seule fonction). Dans ce cours, on fait des tests unitaires **des fonctions du modèle** et on lance les tests depuis un shell donc sans passer par un navigateur.
+
+**IMPORTANT**: Pour faire des tests unitaires, on a besoin de données dont on le seul à modifier, et surtout on a besoin de pouvoir "connaitre" les données. En effet, si on veut tester qu'une fonction qui récupère un utilisateur, comment vérifier les différentes informations si on les connait pas ? On a besoin d'accéder à la base de données avec un client SQL (ou par un autre moyen) et pouvoir constater que l'utilisateur `2355` a les meme informations que ce que nous donne le résultat de notre fonction, par exemple.
 
 Une fois qu'on a une fonction (changée le code précédent dans une fonction):
 
@@ -167,7 +186,7 @@ Une fois qu'on a une fonction (changée le code précédent dans une fonction):
     
     }
 
-on peut faire un test unitaire:
+on peut faire un test unitaire simple:
 
     //Test unitaire de la fonction getAllItems:
     $items = getAllItems();
@@ -176,9 +195,9 @@ on peut faire un test unitaire:
     } else {
         echo "BUG ...";
     }
-    
-### Comment faire des tests unitaires ?
-Voici des explications d'une logique pour des tests basiques et simples pour des fonctions de CRUD, notamment quelques critères de vérification:
+
+### Comment construire des tests unitaires ?
+Voici des explications d'une proposition de structure et d'une logique pour des tests basiques, pour des fonctions CRUD, notamment quelques critères de vérification:
 
 Idée de structure d'un test:
 - un titre "Test de la fonction getUsers()"
@@ -187,33 +206,35 @@ Idée de structure d'un test:
 - Tester si le résultat est celui souhaité en vérifiant certains critères
 - Affichage d'une erreur ou que le test a réussi.
     
-### Php dans un shell ?
-Oui cest possible ! Enfin disons que le résultat généré est affichable en texte.
+### Du PHP dans un shell ?
+Oui cest possible ! Enfin disons que le résultat généré est affiché en mode console. Donc pas vraiment fait pour une vue. Par contre pour des tests ou la gestion du serveur, c'est pratique.
 
-1. se placer dans le bon répertoire `cd C:/Users/John/Documents/AppWeb/` c'est à dire à la racine du site généralement.
+#### Démarrer un serveur php si l'application php.exe est installée (avec Choco, npm, ...)
+Pour ne pas utiliser d'IDE, on peut lancer le serveur de la manière suivante. 
+
+La commande est construite ainsi: `php -S hote:port`. pour `-S` pensez à "**S**tart". Voyons voir en pratique ce que ca donne.
+
+1. se placer à la racine du site `cd C:/Users/John/Documents/AppWeb/`
+1. taper `php -S localhost:8080`. le serveur démarre et affiche les erreurs en cas de problèmes.
+1. ouvrir un navigateur web à l'adresse: `localhost:8080` et on accède au site !
+
+
+#### Executer un fichier php (ici un test unitaire)
+1. se placer à la racine du site `cd C:/Users/John/Documents/AppWeb/`
 1. savoir dans quel sous dossier se trouve le fichier de test qu'on veut lancer.
 1. lancer le fichier avec la commande `php -f <testfile.php>` ou `php -f <unitTests/testfile.php>` si il est placé dans un sous-dossier.
 
+**ATTENTION**.
 Si il y a des chemins de fichiers dans le code (pour rechercher des données d'un fichier .json par ex.), les liens relatifs par rapport à la racine du site pourrait poser problème si on execute depuis le dossier `unitTests` puisque les liens seront relatifs au dossier du shell.
-Pour ne pas devoir changer 2 fois tous les liens relatifs, il est possible et conseillé de lancer les tests depuis le dossier du fichier `index.php` ou du fichier qui est appelé en premier et donc d'où les liens relatifs partent. pour ce faire il suffit de pointer un fichier de test d'un sous-dossier, par exemple `php -f unitTests/testfile.php`
+Pour ne pas devoir changer 2 fois tous les liens relatifs, il est possible et conseillé de lancer les tests depuis le dossier du fichier `index.php` (donc la racine du site) ou du fichier qui est appelé en premier et donc d'où les liens relatifs partent. Par la suite, il suffit de pointer le fichier de test d'un sous-dossier, par exemple `php -f unitTests/testfile.php`
 
-**TDD** = Test Driven Developpement
 
-Principe de développement où on commence par faire les tests puis on fait le code de ce qui est testé (une fonction par exemple) jusqu'à que le test fonctionne. Le développement est donc conduit/guidé par des tests.
+### TDD = Test Driven Developpement
 
-Pour ne pas avoir un tableau indexé et associatif en même temps (toutes les données étant donc à double), il faut mettre un paramètre au fetchAll() qui dit le type de tableau qu'il doit retourner:
+Littéralement: Developpement conduit/dirigé/guidé par des tests.
 
-- `PDO::FETCH_ASSOC` pour avoir un tableau associatif uniquement
-- `PDO::FETCH_NUM` pour avoir un tableau indexé uniquement (partant de index 0)
+Principe de développement où on commence par faire les tests puis on fait le code de ce qui est testé (une fonction par exemple), et on code jusqu'à que le test fonctionne. Le développement est donc guidé par des tests.
 
-Changement:
-    
-    $queryResult = $statment->fetchAll();
-en
-    
-    $queryResult = $statment->fetchAll(PDO::FETCH_ASSOC);
-
-source: https://www.php.net/manual/en/pdostatement.fetch
 
 $query = "UPDATE filmmakers SET
 		filmmakers:
