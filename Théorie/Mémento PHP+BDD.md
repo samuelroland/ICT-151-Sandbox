@@ -183,7 +183,6 @@ Une fois qu'on a une fonction (changée le code précédent dans une fonction):
             print "Error!: " . $e->getMessage() . "<br/>";
             return null;
         }
-    
     }
 
 on peut faire un test unitaire simple:
@@ -206,29 +205,44 @@ Voici des explications d'une proposition de structure et de critères pour des t
 - Tester si le résultat est celui souhaité en vérifiant certains critères
 - Affichage d'une erreur ou que le test a réussi.
 
-#### Idées de critères à vérifier
+#### Idées de vérifications pour les tests:
 On préférera faire les tests dans l'ordre suivant: Read, Create, Update, Delete, ce qui permet de lire des données, créer un nouvel élément, le modifier, puis le supprimer. 
 Ainsi à la fin des tests, le contenu de la base de données n'aura pas été modifié.
 
 Pour simplifier, et ne pas constamment parler d'éléments, on va tester ici un modèle CRUD sur des filmmakers. Ces fonctions et tests ont été réalisés et on les trouve dans le repos ([le modèle crud.php](../crud.php), [le test unitaire testcrud.php](../testcrud.php))
 
 Read
-- Fonction: **Compter tous les éléments**
+- Fonction: **Compter tous les filmmakers**
     - tester que le comptage vaut bien le nombre total de filmmakers. (total = valeur brute/fixe)
-- Fonction: **Lire tous les éléments**:
+- Fonction: **Lire tous les filmmakers**:
     - tester si il y a bien le même nombre de filmmakers que donne le count()
-- Fonction:  **Lire un élément** (par un identifiant: id ou champ unique)
+- Fonction:  **Lire un filmmaker** (par un identifiant: id ou champ unique)
     - Tester que tout le filmmaker lu a des champs qui ont les valeurs attendues.
     - Tester que la fonction retourne null si on demande un élément qui n'existe pas.
 
 Create
-- Fonction: **Créer un élément**
+- Fonction: **Créer un filmmaker**
     - Vérifier que la fonction retourne bien le filmmaker créé (avec son id en plus). donc que ce n'est pas null
-    - vérifier qu'il y a un élément de plus que avant la création. (ne pas oublier de compter le nombre avant de créer).
-    - avec le tableau du nouveau.
+    - Vérifier qu'il y a un élément de plus que avant la création. (ne pas oublier de compter le nombre avant de créer).
+    - Vérifier que le nouveau filmmaker (lu avec "Lire un élément" appelé `$readback`) a les même valeurs que celui créé (`$filmMakerTest` donc celui que l'on a écrit à la main avant de lancer la création) ou que celui retourné (`$newfilmmaker`). Au lieu de tester toutes les informations l'une après l'autre, il suffit de faire `empty(array_diff($newfilmmaker, $readback))` qui devra retourner `true` si il n'y a pas de différence.
 
-### Du PHP dans un shell ?
-Oui cest possible ! Enfin disons que le résultat généré est affiché en mode console. Donc pas vraiment fait pour une vue. Par contre pour des tests ou la gestion du serveur, c'est pratique.
+Update
+- Fonction: **Mettre à jour un filmmaker**
+    - Regarder que la requête fonctionne
+    - Après la mise à jour de champs d'un filmmaker, relire le bon filmmaker et vérifier que tous les champs modifiés ont été mise à jour. On peut le faire aussi en vérifiant qu'il n'y a pas de différence entre le filmmaker lu et le filmmaker qu'on a mis à jour (`empty(array_diff($readback, $filmmakertoupdate))`)
+    
+Delete
+- Fonction: **Supprimer un filmmaker**
+    - Regarder que la requête fonctionne (arrive bien au bout)
+    - Regarder qu'il y a un filmmaker de moins qu'avant la suppression. (en comptant avant et après)
+    - Tenter de relire le filmmaker supprimé. Si on le trouve c'est qu'il n'a pas été supprimé.
+
+
+Ces différentes vérifications, sont données comme exemple pour un CRUD basique. Dans un CRUD plus complet on aura aussi par exemple **Lire tous les films qu'un réalisateur donné a réalisé**. On aura donc d'autres vérifications en plus: vérifier que tous les films ont bien été fait par le réalisateur donné, ... 
+Les vérifications proposées sont pour la base, mais sur des fonctions plus complexes on pourra vérifier d'autres critères en plus.
+
+### Executer du php dans un shell ?
+Oui cest possible ! Enfin disons que le résultat généré est affiché en mode console. Donc pas vraiment fait pour une vue. Par contre pour des tests, la gestion du serveur ou de la base de donnée, c'est pratique.
 
 #### Démarrer un serveur php si l'application php.exe est installée (avec Choco, npm, ...)
 Pour ne pas utiliser d'IDE, on peut lancer le serveur de la manière suivante. 
@@ -249,6 +263,15 @@ La commande est construite ainsi: `php -S hote:port`. pour `-S` pensez à "**S**
 Si il y a des chemins de fichiers dans le code (pour rechercher des données d'un fichier .json par ex.), les liens relatifs par rapport à la racine du site pourrait poser problème si on execute depuis le dossier `unitTests` puisque les liens seront relatifs au dossier du shell.
 Pour ne pas devoir changer 2 fois tous les liens relatifs, il est possible et conseillé de lancer les tests depuis le dossier du fichier `index.php` (donc la racine du site) ou du fichier qui est appelé en premier et donc d'où les liens relatifs partent. Par la suite, il suffit de pointer le fichier de test d'un sous-dossier, par exemple `php -f unitTests/testfile.php`
 
+#### Commandes système 
+Alors ce n'est pas directement dans un shell, mais comme ca concerne les commandes système on est pas très loin.
+
+la fonction `exec($cmd)` permet de lancer une commande système stockée dans `$cmd`.
+
+Un cas concret d'utilisation serait de restaurer la base de données avant de lancer tous les tests unitaires, à l'aide d'un fichier sql.
+
+    $cmd = "mysql -u $user -p$pass < Restore-MCU-PO-Final.sql";   //commande système pour restaurer la base de données.
+    exec($cmd);
 
 ### TDD = Test Driven Developpement
 
