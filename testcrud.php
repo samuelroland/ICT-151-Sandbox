@@ -27,9 +27,13 @@ if (count(getFilmMakers()) == countFilmMakers()) {
 echo "\nTest GetOne() ";
 $item = getFilmMaker(1);
 if ($item['lastname'] == "Bertrand" && $item['firstname'] == "Jean-Michel") {
-    echo "OK !!!";
+    if (getFilmMaker(150) == null){
+        echo "OK !!!";
+    } else {
+        echo "BUG ... id 150 trouvée ?";
+    }
 } else {
-    echo "BUG ...";
+    echo "BUG ... pas les mêmes champs";
 }
 
 echo "\nTest Create() ";
