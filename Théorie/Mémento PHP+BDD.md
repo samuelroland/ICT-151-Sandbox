@@ -201,15 +201,31 @@ Voici des explications d'une proposition de structure et de critères pour des t
 
 #### Idée de structure d'un test:
 - un titre "Test de la fonction getUsers()"
-- Préparer des données
-- Utiliser la fonction pour créer faire une action de CRUD
+- Préparer des données si besoin.
+- Utiliser la fonction qu'on va tester, pour faire une action de CRUD
 - Tester si le résultat est celui souhaité en vérifiant certains critères
 - Affichage d'une erreur ou que le test a réussi.
 
 #### Idées de critères à vérifier
 On préférera faire les tests dans l'ordre suivant: Read, Create, Update, Delete, ce qui permet de lire des données, créer un nouvel élément, le modifier, puis le supprimer. 
-Ainsi à la fin des tests, le contenu de la base de données n'a pas été modifié.
+Ainsi à la fin des tests, le contenu de la base de données n'aura pas été modifié.
 
+Pour simplifier, et ne pas constamment parler d'éléments, on va tester ici un modèle CRUD sur des filmmakers. Ces fonctions et tests ont été réalisés et on les trouve dans le repos ([le modèle crud.php](../crud.php), [le test unitaire testcrud.php](../testcrud.php))
+
+Read
+- Fonction: **Compter tous les éléments**
+    - tester que le comptage vaut bien le nombre total de filmmakers. (total = valeur brute/fixe)
+- Fonction: **Lire tous les éléments**:
+    - tester si il y a bien le même nombre de filmmakers que donne le count()
+- Fonction:  **Lire un élément** (par un identifiant: id ou champ unique)
+    - Tester que tout le filmmaker lu a des champs qui ont les valeurs attendues.
+    - Tester que la fonction retourne null si on demande un élément qui n'existe pas.
+
+Create
+- Fonction: **Créer un élément**
+    - Vérifier que la fonction retourne bien le filmmaker créé (avec son id en plus). donc que ce n'est pas null
+    - vérifier qu'il y a un élément de plus que avant la création. (ne pas oublier de compter le nombre avant de créer).
+    - avec le tableau du nouveau.
 
 ### Du PHP dans un shell ?
 Oui cest possible ! Enfin disons que le résultat généré est affiché en mode console. Donc pas vraiment fait pour une vue. Par contre pour des tests ou la gestion du serveur, c'est pratique.
