@@ -138,7 +138,7 @@ function createFilmMaker($filmMaker)
         return $filmMaker;
     } catch (PDOException $e) { //en cas d'erreur dans le try
         echo "Error!: " . $e->getMessage() . "\n";
-        return false;
+        return null;
     }
 }
 
