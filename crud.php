@@ -53,12 +53,12 @@ function countFilmMakers()
 {
     try {
         $dbh = getPDO();   //créer un objet PDO
-        $query = "SELECT count(*) as nb FROM filmmakers";;//Ecrire la requête.
+        $query = "SELECT count(*) as nb FROM filmmakers";//Ecrire la requête.
         $statment = $dbh->prepare($query);  //préparer la requête
         $statment->execute();   //éxecuter la requête
         $queryResult = $statment->fetch(PDO::FETCH_ASSOC);   //aller chercher le résultat
         $dbh = null;    //remettre à zéro
-        extract($queryResult);  //$nb
+        extract($queryResult);  //$nb seulement
         return $nb;    //retourner le résultat
     } catch (PDOException $e) { //en cas d'erreur dans le try
         echo "Error!: " . $e->getMessage() . "\n";
