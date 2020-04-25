@@ -7,7 +7,7 @@ Dans ce cours, on travaille avec PDO (PHP Data Object s?). C'est un outil pour t
 Pour ce mémento, on utilise une base de donnée appelée `mcu` qui contient des données sur des films marvel. On retrouve [le script SQL ici](../Restore-MCU-PO-Final.sql).
 
 ### CRUD
-En résumé, ce sont les 4 fonctionnalités de base dans beaucoup d'applications en informatiques, pour intéragir avec des données.
+C'est l'acronyme des 4 fonctionnalités générales qu'on retrouve dans beaucoup d'applications en informatiques, puisque c'est les seuls possibilités d'intéragir avec des données.
 - **C**reate: créer
 - **R**ead: lire
 - **U**pdate: mettre à jour/modifier
@@ -68,8 +68,8 @@ Avec CMDER ou tout autre shell:
 
 Résultat: Il exécute le fichier php et affiche donc les deux enregistrements trouvés dans la BDD.
 
-Mais c'est un problème d'avoir les identifiants en clair dans le code et de les publier sur Github.
-C'est pour cette raison qu'on va faire un fichier séparé `.const.php` qui contient uniquement les constantes des informations pour la connexion à la BDD. Le fichier commence par un `.`. C'est une convention pour les fichiers cachés.
+Mais c'est un gros problème d'**avoir les identifiants en clair dans le code** et de les publier sur Github ! Pas très pratique aussi, si on doit changer les identifiants dans plein de fichiers différent, quand ils changent.
+C'est pour cette raison qu'on va **faire un fichier séparé `.const.php`** qui contient les constantes pour la connexion à la BDD, mais on peut aussi y stocker d'autres données qui doivent rester en local ou qui serve au développement. Le fichier commence par un `.`. C'est une convention pour les fichiers cachés.
 
     <?php
     /**
@@ -160,6 +160,42 @@ en
 source: https://www.php.net/manual/en/pdostatement.fetch
 
 
+Au lieu de faire comme nous l'avons vu jusqu'à maintenant:
+    
+    function getOneUser($email)
+    {
+        try {
+            $dbh = getPDO();
+            $query = "SELECT * FROM users where users.email =$email";    //Ecrire la requête
+            $statment = $dbh->prepare($query);  //préparer la requête
+            $statment->execute();   //éxecuter la requête
+            $queryResult = $statment->fetch(PDO::FETCH_ASSOC);   //aller chercher le résultat
+            $dbh = null;    //remettre à zéro
+            return $queryResult;    //retourner le résultat
+        } catch (PDOException $e) { //en cas d'erreur dans le try
+            echo "Error!: " . $e->getMessage() . "\n";
+            return null;
+        }
+    }
+
+On va changer le $email en un paramètre appelé `email`. On va mettre un `:` avant pour signifier que c'est un paramètre sql. (un peu comme le `$` signifie que c'est une variable). Puis dans le paramètre de `$statment->execute()` on va mettre un tableau associatif dont une des clés s'appelle `email`.
+
+    function getOneUser($email)
+    {
+        try {
+            $dbh = getPDO();
+            $query = "SELECT * FROM users where users.email =:email";    //Ecrire la requête
+            $statment = $dbh->prepare($query);  //préparer la requête
+            $statment->execute(["email" => $email]);   //éxecuter la requête
+            $queryResult = $statment->fetch(PDO::FETCH_ASSOC);   //aller chercher le résultat
+            $dbh = null;    //remettre à zéro
+            return $queryResult;    //retourner le résultat
+        } catch (PDOException $e) { //en cas d'erreur dans le try
+            echo "Error!: " . $e->getMessage() . "\n";
+            return null;
+        }
+    }
+
 ### Faire des tests unitaires:
 
 Les tests unitaires permettent de tester le bon fonctionnement de chaque fonction séparément (unitaire donc on teste qu'une seule fonction). Dans ce cours, on fait des tests unitaires **des fonctions du modèle** et on lance les tests depuis un shell donc sans passer par un navigateur.
@@ -211,7 +247,7 @@ Ainsi à la fin des tests, le contenu de la base de données n'aura pas été mo
 
 Pour simplifier, et ne pas constamment parler d'éléments, on va tester ici un modèle CRUD sur des filmmakers. Ces fonctions et tests ont été réalisés et on les trouve dans le repos ([le modèle crud.php](../crud.php), [le test unitaire testcrud.php](../testcrud.php))
 
-Read
+**Read**
 - Fonction: **Compter tous les filmmakers**
     - tester que le comptage vaut bien le nombre total de filmmakers. (total = valeur brute/fixe)
 - Fonction: **Lire tous les filmmakers**:
@@ -220,18 +256,18 @@ Read
     - Tester que tout le filmmaker lu a des champs qui ont les valeurs attendues.
     - Tester que la fonction retourne null si on demande un élément qui n'existe pas.
 
-Create
+**Create**
 - Fonction: **Créer un filmmaker**
     - Vérifier que la fonction retourne bien le filmmaker créé (avec son id en plus). donc que ce n'est pas null
     - Vérifier qu'il y a un élément de plus que avant la création. (ne pas oublier de compter le nombre avant de créer).
     - Vérifier que le nouveau filmmaker (lu avec "Lire un élément" appelé `$readback`) a les même valeurs que celui créé (`$filmMakerTest` donc celui que l'on a écrit à la main avant de lancer la création) ou que celui retourné (`$newfilmmaker`). Au lieu de tester toutes les informations l'une après l'autre, il suffit de faire `empty(array_diff($newfilmmaker, $readback))` qui devra retourner `true` si il n'y a pas de différence.
 
-Update
+**Update**
 - Fonction: **Mettre à jour un filmmaker**
     - Regarder que la requête fonctionne
     - Après la mise à jour de champs d'un filmmaker, relire le bon filmmaker et vérifier que tous les champs modifiés ont été mise à jour. On peut le faire aussi en vérifiant qu'il n'y a pas de différence entre le filmmaker lu et le filmmaker qu'on a mis à jour (`empty(array_diff($readback, $filmmakertoupdate))`)
     
-Delete
+**Delete**
 - Fonction: **Supprimer un filmmaker**
     - Regarder que la requête fonctionne (arrive bien au bout)
     - Regarder qu'il y a un filmmaker de moins qu'avant la suppression. (en comptant avant et après)
