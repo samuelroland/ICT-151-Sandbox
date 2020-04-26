@@ -1,7 +1,7 @@
 <?php
 /**
  *  Projet: ICT-151-SandBox
- *  Filename: index.php
+ *  Filename: testcrud.php  fonctions de tests unitaires pour les fonctions du modèle crud.php
  *  Author: Samuel Roland
  *  Creation date: 06.02.2020
  */
@@ -50,12 +50,13 @@ $filmMakerTest = [
 $nfm = countFilmMakers();
 $newfilmmaker = createFilmMaker($filmMakerTest);
 
-if (createFilmMaker($filmMakerTest) != null) {
+if ($newfilmmaker != null) {
     if (countFilmMakers() == $nfm + 1) {     //il y a un enregistrement de plus dans la table.
-        $readback = getFilmMaker($newfilmmaker['id']);
+        $readback = getFilmMaker($newfilmmaker['id']);  //lire le filmmaker créé.
         if ($readback != null) {
+        $filmMakerTest['id'] = $newfilmmaker['id'];  //ajouter l'id générée pour pouvoir comparer entièrement ensuite
             if ($readback['id'] == $newfilmmaker['id']) {
-                if (empty(array_diff($newfilmmaker, $readback))) {   //compare les deux tableaux pour savoir si il n'y a pas de différence.
+                if (empty(array_diff($filmMakerTest, $readback))) {   //compare les deux tableaux pour savoir si il n'y a pas de différence.
                     echo "OK !!!";
                 } else {
                     echo "BUG, error in the data inserted";
@@ -71,12 +72,6 @@ if (createFilmMaker($filmMakerTest) != null) {
     }
 } else {
     echo "BUG function crash";
-}
-
-if ($readback) {
-    echo "OK !!!";
-} else {
-    echo "BUG ...";
 }
 
 echo "\nTest Update() ";

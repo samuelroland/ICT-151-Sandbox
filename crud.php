@@ -1,14 +1,14 @@
 <?php
 /**
  *  Projet: ICT-151-SandBox
- *  Filename: index.php
+ *  Filename: crud.php fonction du modèle CRUD.
  *  Author: Samuel Roland
  *  Creation date: 06.02.2020
  */
 
 // Recharger la base de données pour être sûr à 100% des données de test
-require '.const.php';  //récuperer les identifiants
-$cmd = "mysql -u $user -p$pass < Restore-MCU-PO-Final.sql";   //command system pour
+require '.const.php';  //récuperer les identifiants de la base de données.
+$cmd = "mysql -u $user -p$pass < Restore-MCU-PO-Final.sql";   //command system pour restaurer la base de données.
 exec($cmd);
 
 function getPDO()   //create the PDO object
