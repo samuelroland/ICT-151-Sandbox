@@ -131,17 +131,18 @@ On crée un objet PDO de cette manière:
     
         $queryResult = $statment->fetchAll();
         
-Ou un seul résultat:
+5. Ou un seul résultat:
 
     $queryResult = $statment->fetch();
 
 fetchAll() retourne un tableau de tableaux associatifs. tandis que fetch() retourne un tableau associatif qui ne contient donc qu'un seul enregistrement.
 
-
-
-Visuellement ca donne ca:
+Visuellement ca donne ca si on teste fetch() et fetchAll() pour un seul enregistrement. Ca ne fait pas beaucoup de sens d'utiliser fetchAll() puisqu'il faudra utiliser 2 dimensions au lieu d'une seule.
 
 ![Comparaison-fetch()-et-fetchAll()](https://raw.githubusercontent.com/samuelroland/ICT-151-Sandbox/master/Th%C3%A9orie/fetch-fetchall-comparaison.PNG)
+
+Un fetch() sur plusieurs enregistrements prendra uniquement le premier enregistrement...
+
 
 **ATTENTION particularité**.
 Pour ne pas avoir un tableau indexé et associatif (créé par fetch() ou fetchAll()) en même temps (toutes les données étant donc à double), il faut mettre un paramètre aux méthodes qui dit le type de tableau qu'il doit retourner. Ces paramètres sont des constantes internes de PDO. On les atteind de la manière suivante `PDO::NomConstante`
@@ -160,7 +161,7 @@ en
 source: https://www.php.net/manual/en/pdostatement.fetch
 
 ### Les paramètres sql
-Afin de se simplifier la vie mais aussi pour sécuriser l'application contre les injections sql, on utilise des paramètres sql. Ces paramètres seront remplacés par la méthode execute(). Explication détaillée.
+Afin de se simplifier la vie mais aussi pour sécuriser l'application contre les injections sql, on utilise des paramètres sql. Ces paramètres seront remplacés par leurs valeurs durant l'éxecution de la méthode execute(). Explication détaillée.
 
 Au lieu de faire comme nous l'avons vu jusqu'à maintenant:
     
@@ -168,13 +169,13 @@ Au lieu de faire comme nous l'avons vu jusqu'à maintenant:
     {
         try {
             $dbh = getPDO();
-            $query = "SELECT * FROM users where users.email =$email";    //Ecrire la requête
-            $statment = $dbh->prepare($query);  //préparer la requête
-            $statment->execute();   //éxecuter la requête
-            $queryResult = $statment->fetch(PDO::FETCH_ASSOC);   //aller chercher le résultat
-            $dbh = null;    //remettre à zéro
-            return $queryResult;    //retourner le résultat
-        } catch (PDOException $e) { //en cas d'erreur dans le try
+            $query = "SELECT * FROM users where users.email =$email";
+            $statment = $dbh->prepare($query);
+            $statment->execute();
+            $queryResult = $statment->fetch(PDO::FETCH_ASSOC);
+            $dbh = null;
+            return $queryResult;
+        } catch (PDOException $e) {
             echo "Error!: " . $e->getMessage() . "\n";
             return null;
         }
@@ -186,17 +187,30 @@ On va changer le $email en un paramètre appelé `email`. On va mettre un `:` av
     {
         try {
             $dbh = getPDO();
-            $query = "SELECT * FROM users where users.email =:email";    //Ecrire la requête
-            $statment = $dbh->prepare($query);  //préparer la requête
-            $statment->execute(["email" => $email]);   //éxecuter la requête
-            $queryResult = $statment->fetch(PDO::FETCH_ASSOC);   //aller chercher le résultat
-            $dbh = null;    //remettre à zéro
-            return $queryResult;    //retourner le résultat
-        } catch (PDOException $e) { //en cas d'erreur dans le try
+            $query = "SELECT * FROM users where users.email =:email";
+            $statment = $dbh->prepare($query);
+            $statment->execute(["email" => $email]);
+            $queryResult = $statment->fetch(PDO::FETCH_ASSOC);
+            $dbh = null;
+            return $queryResult;
+        } catch (PDOException $e) {
             echo "Error!: " . $e->getMessage() . "\n";
             return null;
         }
     }
+    
+Pour que le remplacement des paramètres par leur données fonctionne, il faut que le paramètre ait le même nom qu'une des clés du tableau associatif fourni comme paramètre (php) de execute(), et aussi que la clé existe dans le tableau (forcément). 
+
+En cas d'erreur (clés inexistantes ou pas toutes les clés):
+`PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: parameter was not defined in C:\...` et la requête échoue.
+
+**Attention**, les paramètres sql ne peuvent être utilisé **que pour des valeurs dans la requête** et **non** sur des **noms de tables** ou des **noms de colonnes**.
+
+La requête suivante ne fonctionnera pas:
+
+        $query = "SELECT * FROM :tablename";
+
+Source: [Stackoverflow](https://stackoverflow.com/questions/182287/can-php-pdo-statements-accept-the-table-or-column-name-as-parameter)
 
 ### Faire des tests unitaires:
 
@@ -316,6 +330,37 @@ Un cas concret d'utilisation serait de restaurer la base de données avant de la
 Littéralement: Developpement conduit/dirigé/guidé par des tests.
 
 Principe de développement où on commence par faire les tests puis on fait le code de ce qui est testé (une fonction par exemple), et on code jusqu'à que le test fonctionne. Le développement est donc guidé par des tests.
+
+### Refactorisation et DRY
+Ce qu'on fait là avec ces fonctions du modèle est en fait très répétitif! On ne change que la requête, les données en paramètres de la fonction, les données du execute() et changer en fetch() ou fetchAll() et ce que la fonction retourne. On ne respecte donc pas du tout la règle **DRY (Don't Repeat Yourself)**.
+
+On a donc les éléments suivants qui sont fixes:
+1. `require_once '.const.php';` + `$dbh = new PDO('mysql:host=' . $dbhost . ';dbname=' . $dbname, $user, $pass);`. On le remplace par :
+
+        function getPDO()   //create the PDO object
+        {
+            require '.const.php';  //récuperer les identifiants
+            return new PDO('mysql:host=' . $dbhost . ';dbname=' . $dbname, $user, $pass);   //créer un objet PDO
+        }
+
+2. le ` $statment = $dbh->prepare($query);`
+
+3. le `$statment->execute();` qui ne bouge pas peu importe si il y a des données ou pas en paramètre.
+
+4. le `$dbh = null;` 
+
+5. le `try` et le contenu du `catch ...`
+    
+        try {
+        
+        } catch (PDOException $e) {
+            echo "Error!: " . $e->getMessage() . "\n";
+            return null;
+        }
+
+Bon maintenant qu'on voit une bonne partie est fixe, on arrive sur la question de "Comment faire pour gérer les différents cas de fetch(), fetchAll(), données ou pas, return ou pas, etc."
+
+Voici comment on peut faire, même si on ne peut pas faire qu'une seule fonction.
 
 
 $query = "UPDATE filmmakers SET
