@@ -141,7 +141,7 @@ fetchAll() retourne un tableau de tableaux associatifs. tandis que fetch() retou
 
 Visuellement ca donne ca:
 
-![Fetch-FetchAll.png](asdf)
+![Compairaison fetch() et fetchAll()](fetch-fetchall-comparaison.png)
 
 **ATTENTION particularité**.
 Pour ne pas avoir un tableau indexé et associatif (créé par fetch() ou fetchAll()) en même temps (toutes les données étant donc à double), il faut mettre un paramètre aux méthodes qui dit le type de tableau qu'il doit retourner. Ces paramètres sont des constantes internes de PDO. On les atteind de la manière suivante `PDO::NomConstante`
@@ -159,6 +159,8 @@ en
 
 source: https://www.php.net/manual/en/pdostatement.fetch
 
+### Les paramètres sql
+Afin de se simplifier la vie mais aussi pour sécuriser l'application contre les injections sql, on utilise des paramètres sql. Ces paramètres seront remplacés par la méthode execute(). Explication détaillée.
 
 Au lieu de faire comme nous l'avons vu jusqu'à maintenant:
     
