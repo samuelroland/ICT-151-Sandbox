@@ -141,7 +141,7 @@ fetchAll() retourne un tableau de tableaux associatifs. tandis que fetch() retou
 
 Visuellement ca donne ca:
 
-![Compairaison fetch() et fetchAll()](fetch-fetchall-comparaison.png)
+![Comparaison-fetch()-et-fetchAll()](fetch-fetchall-comparaison.png)
 
 **ATTENTION particularité**.
 Pour ne pas avoir un tableau indexé et associatif (créé par fetch() ou fetchAll()) en même temps (toutes les données étant donc à double), il faut mettre un paramètre aux méthodes qui dit le type de tableau qu'il doit retourner. Ces paramètres sont des constantes internes de PDO. On les atteind de la manière suivante `PDO::NomConstante`
