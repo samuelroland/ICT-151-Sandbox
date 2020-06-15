@@ -216,7 +216,7 @@ Source: [Stackoverflow](https://stackoverflow.com/questions/182287/can-php-pdo-s
 
 Les tests unitaires permettent de tester le bon fonctionnement de chaque fonction séparément (unitaire = on teste qu'**une seule** fonction). Dans ce cours, on fait des tests unitaires **des fonctions du modèle** et on lance les tests **depuis un shell** donc sans passer par un navigateur car pas besoin de mode graphique.
 
-**IMPORTANT**: Pour faire des tests unitaires, on a besoin de données dont on le seul à modifier, et surtout on a besoin de pouvoir "connaitre" les données. En effet, si on veut tester qu'une fonction qui récupère un utilisateur, comment vérifier les différentes informations si on les connait pas ? On a besoin d'accéder à la base de données avec un client SQL (ou par un autre moyen) et pouvoir constater que l'utilisateur `2355` a les mêmes informations que ce que nous donne le résultat de notre fonction, par exemple.
+**IMPORTANT**: Pour faire des tests unitaires, on a besoin de données dont on est le seul à modifier, et surtout on a besoin de pouvoir "connaître" les données. En effet, si on veut tester une fonction qui récupère un utilisateur, comment vérifier les différentes informations si on les connait pas ? On a besoin d'accéder à la base de données avec un client SQL (ou par un autre moyen) et pouvoir constater que l'utilisateur `2355` a les mêmes informations que ce que nous donne le résultat de notre fonction, par exemple.
 
 Une fois qu'on a une fonction (changée le code précédent dans une fonction):
 
