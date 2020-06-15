@@ -2,7 +2,7 @@
 ## Intégrer des BDD dans des applications WEB
 
 ### Introduction:
-Dans ce cours, on travaille avec PDO (PHP Data Object s?). C'est un outil pour travailler avec les bases de données. (comme pour la pelle qui est un outil pour creuser, il y a plusieurs outils pour travailler avec des bases de données, mais nous n'utiliserons dans ce cours que PDO).
+Dans ce cours, on travaille avec **PDO** (PHP Data Objects). C'est un outil pour travailler avec les bases de données. (comme pour la pelle qui est un outil pour creuser, il y a plusieurs outils pour travailler avec des bases de données, mais nous n'utiliserons dans ce cours que PDO).
 
 Pour ce mémento, on utilise une base de donnée appelée `mcu` qui contient des données sur des films marvel. On retrouve [le script SQL ici](../Restore-MCU-PO-Final.sql).
 
@@ -135,17 +135,17 @@ On crée un objet PDO de cette manière:
 
     $queryResult = $statment->fetch();
 
-fetchAll() retourne un tableau de tableaux associatifs. tandis que fetch() retourne un tableau associatif qui ne contient donc qu'un seul enregistrement.
+`fetchAll()` retourne un tableau de tableaux associatifs. tandis que `fetch()` retourne un tableau associatif qui ne contient donc qu'un seul enregistrement.
 
-Visuellement ca donne ca si on teste fetch() et fetchAll() pour un seul enregistrement. Ca ne fait pas beaucoup de sens d'utiliser fetchAll() puisqu'il faudra utiliser 2 dimensions au lieu d'une seule.
+Visuellement ca donne ca si on teste `fetch()` et `fetchAll()` pour un seul enregistrement. Ca ne fait pas beaucoup de sens d'utiliser fetchAll() puisqu'il faudra utiliser 2 dimensions au lieu d'une seule.
 
 ![Comparaison-fetch()-et-fetchAll()](https://raw.githubusercontent.com/samuelroland/ICT-151-Sandbox/master/Th%C3%A9orie/fetch-fetchall-comparaison.PNG)
 
-Un fetch() sur plusieurs enregistrements prendra uniquement le premier enregistrement...
+Un `fetch()` sur plusieurs enregistrements prendra uniquement le premier enregistrement...
 
 
 **ATTENTION particularité**.
-Pour ne pas avoir un tableau indexé et associatif (créé par fetch() ou fetchAll()) en même temps (toutes les données étant donc à double), il faut mettre un paramètre aux méthodes qui dit le type de tableau qu'il doit retourner. Ces paramètres sont des constantes internes de PDO. On les atteind de la manière suivante `PDO::NomConstante`
+Pour ne pas avoir un tableau indexé et associatif (créé par `fetch()` ou `fetchAll()`) en même temps (toutes les données étant donc à double), il faut mettre un paramètre aux méthodes qui dit le type de tableau qu'il doit retourner. Ces paramètres sont des constantes internes de PDO. On les atteind de la manière suivante `PDO::NomConstante`
 
 Une petite liste de possibilités très utiles:
 - `PDO::FETCH_ASSOC` pour avoir un tableau associatif uniquement
@@ -160,8 +160,8 @@ en
 
 source: https://www.php.net/manual/en/pdostatement.fetch
 
-### Les paramètres sql
-Afin de se simplifier la vie mais aussi pour sécuriser l'application contre les injections sql, on utilise des paramètres sql. Ces paramètres seront remplacés par leurs valeurs durant l'éxecution de la méthode execute(). Explication détaillée.
+### Les paramètres SQL
+Afin de se simplifier la vie mais aussi pour sécuriser l'application contre les injections SQL, on utilise des paramètres SQL. Ces paramètres seront remplacés par leurs valeurs durant l'éxecution de la méthode `execute()`. Explication détaillée.
 
 Au lieu de faire comme nous l'avons vu jusqu'à maintenant:
     
@@ -181,7 +181,7 @@ Au lieu de faire comme nous l'avons vu jusqu'à maintenant:
         }
     }
 
-On va changer le $email en un paramètre appelé `email`. On va mettre un `:` avant pour signifier que c'est un paramètre sql. (un peu comme le `$` signifie que c'est une variable). Puis dans le paramètre de `$statment->execute()` on va mettre un tableau associatif dont une des clés s'appelle `email`.
+On va changer le `$email` en un paramètre appelé `email`. On va mettre un `:` avant pour signifier que c'est un paramètre SQL. (un peu comme le `$` signifie que c'est une variable). Puis dans le paramètre de `$statment->execute()` on va mettre un tableau associatif dont une des clés s'appelle `email`.
 
     function getOneUser($email)
     {
@@ -204,7 +204,7 @@ Pour que le remplacement des paramètres par leur données fonctionne, il faut q
 En cas d'erreur (clés inexistantes ou pas toutes les clés):
 `PHP Warning:  PDOStatement::execute(): SQLSTATE[HY093]: Invalid parameter number: parameter was not defined in C:\...` et la requête échoue.
 
-**Attention**, les paramètres sql ne peuvent être utilisé **que pour des valeurs dans la requête** et **non** sur des **noms de tables** ou des **noms de colonnes**.
+**Attention**, les paramètres SQL ne peuvent être utilisé **que pour des valeurs dans la requête** et **non** sur des **noms de tables** ou des **noms de colonnes**.
 
 La requête suivante ne fonctionnera pas:
 
@@ -320,7 +320,7 @@ Alors ce n'est pas directement dans un shell, mais comme ca concerne les command
 
 la fonction `exec($cmd)` permet de lancer une commande système stockée dans `$cmd`.
 
-Un cas concret d'utilisation serait de restaurer la base de données avant de lancer tous les tests unitaires, à l'aide d'un fichier sql.
+Un cas concret d'utilisation serait de restaurer la base de données avant de lancer tous les tests unitaires, à l'aide d'un fichier SQL.
 
     $cmd = "mysql -u $user -p$pass < Restore-MCU-PO-Final.sql";   //commande système pour restaurer la base de données.
     exec($cmd);
@@ -332,7 +332,7 @@ Littéralement: Developpement conduit/dirigé/guidé par des tests.
 Principe de développement où on commence par faire les tests puis on fait le code de ce qui est testé (une fonction par exemple), et on code jusqu'à que le test fonctionne. Le développement est donc guidé par des tests.
 
 ### Refactorisation et DRY
-Ce qu'on fait là avec ces fonctions du modèle est en fait très répétitif! On ne change que la requête, les données en paramètres de la fonction, les données du execute() et changer en fetch() ou fetchAll() et ce que la fonction retourne. On ne respecte donc pas du tout la règle **DRY (Don't Repeat Yourself)**.
+Ce qu'on fait là avec ces fonctions du modèle est en fait très répétitif! On ne change que la requête, les données en paramètres de la fonction, les données du execute() et changer en `fetch()` ou `fetchAll()` et ce que la fonction retourne. On ne respecte donc pas du tout la règle **DRY (Don't Repeat Yourself)**.
 
 On a donc les éléments suivants qui sont fixes:
 1. `require_once '.const.php';` + `$dbh = new PDO('mysql:host=' . $dbhost . ';dbname=' . $dbname, $user, $pass);`. On le remplace par :
@@ -358,7 +358,7 @@ On a donc les éléments suivants qui sont fixes:
             return null;
         }
 
-Bon maintenant qu'on voit une bonne partie est fixe, on arrive sur la question de "Comment faire pour gérer les différents cas de fetch(), fetchAll(), données ou pas, return ou pas, etc."
+Bon maintenant qu'on voit une bonne partie est fixe, on arrive sur la question de "Comment faire pour gérer les différents cas de `fetch()`, `fetchAll()`, données ou pas, return ou pas, etc."
 
 Voici comment on peut faire, même si on ne peut pas faire qu'une seule fonction.
 
